@@ -28,6 +28,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import java.util.List;
 import java.util.Properties;
@@ -43,6 +45,11 @@ public class KafkaStreamWriter implements StreamWriterInterface {
     private static final Logger logger = LoggerFactory.getLogger(KafkaStreamWriter.class);
 
     /**
+     * Send System Time Marker
+     */
+    private static final Marker sendSystemTimeMarker = MarkerFactory.getMarker("SENDSYSTEMTIME");
+
+    /**
      * Properties
      */
     private final Properties properties;
@@ -56,6 +63,11 @@ public class KafkaStreamWriter implements StreamWriterInterface {
      * Identifier of the match
      */
     private String matchId;
+
+    /**
+     * Flag which specifies if the send system times should be logged to a CSV file
+     */
+    private boolean logSendSystemTimes;
 
     /**
      * KafkaStreamWriter constructor.
@@ -76,6 +88,7 @@ public class KafkaStreamWriter implements StreamWriterInterface {
 
         String brokerList = PropertyReadHelper.readStringOrDie(this.properties, "streamWriter.kafka.brokerList");
         this.matchId = PropertyReadHelper.readStringOrDie(this.properties, "match.id");
+        this.logSendSystemTimes = PropertyReadHelper.readBooleanOrDie(this.properties, "streamWriter.logSendSystemTimes");
 
         Properties props = new Properties();
         props.put("bootstrap.servers", brokerList);
@@ -95,7 +108,7 @@ public class KafkaStreamWriter implements StreamWriterInterface {
 
         // Write a dummy record to a dummy topic in order to prevent that the first data stream elements are sent in batches
         String dummyString = "dummy";
-        this.producer.send(new ProducerRecord(dummyTopic, this.matchId, dummyString.getBytes()));
+        sendWithSamzaPartitioning(dummyTopic, this.matchId, dummyString.getBytes());
         logger.info("Sent dummy record to dummy topic.");
 
         if (isMatchAnnouncer) {
@@ -118,7 +131,7 @@ public class KafkaStreamWriter implements StreamWriterInterface {
 
             try {
                 MatchMetadataStreamElement matchMetadataStreamElement = MatchMetadataStreamElement.generateMatchMetadataStreamElement(this.matchId, matchStartTimestampInMs, matchStartTimestampInMs, sport, fieldLength, fieldWidth, mirroredX, mirroredY, areaInfos, matchStartUnixTs, competition, venue, objectRenameMap, teamRenameMap, videoPath, videoOffset, teamColors);
-                this.producer.send(new ProducerRecord(matchMetadataStreamElement.getStreamName(), matchMetadataStreamElement.getKey(), matchMetadataStreamElement.getContentAsByteArray()));
+                sendWithSamzaPartitioning(matchMetadataStreamElement.getStreamName(), matchMetadataStreamElement.getKey(), matchMetadataStreamElement.getContentAsByteArray());
                 logger.info("Sent matchMetadata stream element.");
             } catch (AbstractImmutableDataStreamElement.CannotGenerateDataStreamElement e) {
                 logger.error("Error during generating matchMetadata stream element: ", e);
@@ -137,9 +150,25 @@ public class KafkaStreamWriter implements StreamWriterInterface {
     @Override
     public void sendDataStreamElements(List<RawPositionSensorDataStreamElement> dataStreamElements) {
         for (RawPositionSensorDataStreamElement dataStreamElement : dataStreamElements) {
-            this.producer.send(new ProducerRecord(dataStreamElement.getStreamName(), dataStreamElement.getKey(), dataStreamElement.getContentAsByteArray()));
+            if (this.logSendSystemTimes) {
+                logger.info(sendSystemTimeMarker, "{},{},{}", new Object[]{dataStreamElement.getKey(), dataStreamElement.getGenerationTimestamp(), System.currentTimeMillis()});
+            }
+            sendWithSamzaPartitioning(dataStreamElement.getStreamName(), dataStreamElement.getKey(), dataStreamElement.getContentAsByteArray());
         }
         this.producer.flush();
+    }
+
+    /**
+     * Sends a producer record to Kafka using Samza's partitioning style.
+     *
+     * @param topic Topic
+     * @param key   Key
+     * @param value Value
+     */
+    public void sendWithSamzaPartitioning(String topic, String key, byte[] value) {
+        // See https://github.com/apache/samza/blob/0.13.1/samza-kafka/src/main/scala/org/apache/samza/util/KafkaUtil.scala and https://github.com/apache/samza/blob/0.13.1/samza-kafka/src/main/scala/org/apache/samza/system/kafka/KafkaSystemProducer.scala
+        Integer partition = Math.abs(key.hashCode()) % this.producer.partitionsFor(topic).size();
+        this.producer.send(new ProducerRecord(topic, partition, key, value));
     }
 
     /**

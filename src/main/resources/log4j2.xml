@@ -24,14 +24,23 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <MarkerFilter marker="SENDSYSTEMTIME" onMatch="DENY" onMismatch="ACCEPT"/>
         </Console>
         <Console name="ConsoleError" target="SYSTEM_ERR">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <MarkerFilter marker="SENDSYSTEMTIME" onMatch="DENY" onMismatch="ACCEPT"/>
         </Console>
 
         <!-- Filename as parameter: http://stackoverflow.com/questions/2810926/how-to-give-dynamic-file-name-in-the-appender-in-log4j-xml -->
         <File name="File" fileName="${filename}" append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <MarkerFilter marker="SENDSYSTEMTIME" onMatch="DENY" onMismatch="ACCEPT"/>
+        </File>
+
+        <!-- https://stackoverflow.com/questions/24553348/how-to-produce-a-header-row-in-log4j2 -->
+        <File name="Csv" fileName="./log/rawPositionSensorDataSendSystemTimes.csv" append="true">
+            <PatternLayout pattern="%msg%n" header="matchId,generationTimestamp,sendSystemTimestamp%n"/>
+            <MarkerFilter marker="SENDSYSTEMTIME" onMatch="ACCEPT" onMismatch="DENY"/>
         </File>
     </Appenders>
     <Loggers>
@@ -43,6 +52,7 @@
                 <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             </AppenderRef>
             <AppenderRef ref="File"/>
+            <AppenderRef ref="Csv"/>
         </Root>
     </Loggers>
 </Configuration>

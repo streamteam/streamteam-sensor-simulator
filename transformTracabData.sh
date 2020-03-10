@@ -24,4 +24,4 @@ die() {
 }
 [ "$#" -ge 2 ] || die "requires at least two arguments (trackingDataFilePath, metaDataFilePath), $# provided"
 
-java -classpath "./target/streamteam-sensor-simulator-1.0.0-jar-with-dependencies.jar" -DlogFileName=TracabFileTransformator ch.unibas.dmi.dbis.streamTeam.tracabFileTransformator.TracabFileTransformator $@
+java -classpath "./target/streamteam-sensor-simulator-1.0.1-jar-with-dependencies.jar" -DlogFileName=TracabFileTransformator ch.unibas.dmi.dbis.streamTeam.tracabFileTransformator.TracabFileTransformator $@

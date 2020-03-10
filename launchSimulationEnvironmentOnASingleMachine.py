@@ -48,9 +48,6 @@ matchId = uuid.uuid4().int % 1000000
 
 execfile("./sensorData/" + match + "/sids.py")
 
-print "Clean logs..."
-subprocess.call("rm ./log/*", shell=True)
-
 print "Calculate starting timestamp parameter for sensor simulators..."
 curTimeInS = time.time()
 simulationStartTimeInS = curTimeInS + 40  # start simulation 40 seconds in the future
@@ -65,8 +62,8 @@ isMatchAnnouncer = "true"
 for curSid in sids:
     print "Start Sensor Simulator for sensor " + curSid
 
-    logFileNameCommandPart = "-DlogFileName=SensorSimulator_" + curSid.replace("/", "_") + "_local"
-    jarCommandPart = "-jar ./target/streamteam-sensor-simulator-1.0.0-jar-with-dependencies.jar"
+    logFileNameCommandPart = "-DlogFileName=SensorSimulator_" + str(matchId) + "_" + curSid.replace("/", "_") + "_local"
+    jarCommandPart = "-jar ./target/streamteam-sensor-simulator-1.0.1-jar-with-dependencies.jar"
     curPathToSensorDataFile = pathToSensorDataFiles + curSid + ".csv"
     argsCommandPart = logFileNameCommandPart + " " + jarCommandPart + " " + matchConfigFile + " " + str(matchId) + " " + curPathToSensorDataFile + " " + simulationStartTimeInMsString + " " + isMatchAnnouncer
 
