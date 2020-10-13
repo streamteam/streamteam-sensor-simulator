@@ -166,7 +166,7 @@ public class KafkaStreamWriter implements StreamWriterInterface {
      * @param value Value
      */
     public void sendWithSamzaPartitioning(String topic, String key, byte[] value) {
-        // See https://github.com/apache/samza/blob/0.13.1/samza-kafka/src/main/scala/org/apache/samza/util/KafkaUtil.scala and https://github.com/apache/samza/blob/0.13.1/samza-kafka/src/main/scala/org/apache/samza/system/kafka/KafkaSystemProducer.scala
+        // See https://github.com/apache/samza/blob/1.5.1/samza-kafka/src/main/java/org/apache/samza/util/KafkaUtil.java (line 49) and https://github.com/apache/samza/blob/1.5.1/samza-kafka/src/main/scala/org/apache/samza/system/kafka/KafkaSystemProducer.scala (line 97)
         Integer partition = Math.abs(key.hashCode()) % this.producer.partitionsFor(topic).size();
         this.producer.send(new ProducerRecord(topic, partition, key, value));
     }

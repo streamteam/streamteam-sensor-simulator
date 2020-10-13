@@ -39,6 +39,7 @@ for node in `cat $DIR/sensorSimulatorNode.txt`; do
 	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "rm -Rf streamteam-sensor-simulator"
 	scp -i ~/.ssh/lukasPMAAS ./streamteam-sensor-simulator.tar.gz ubuntu@$node:streamteam-sensor-simulator.tar.gz
 	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "tar -xzf streamteam-sensor-simulator.tar.gz"
+	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "rm streamteam-sensor-simulator.tar.gz"
 done
 
 rm streamteam-sensor-simulator.tar.gz
