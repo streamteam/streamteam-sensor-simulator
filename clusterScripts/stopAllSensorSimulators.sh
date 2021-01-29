@@ -18,24 +18,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-#http://stackoverflow.com/questions/18568706/check-number-of-arguments-passed-to-a-bash-script
-if [ "$#" -ne 1 ]; then
-	echo "Expected parameters: <line>"
-	echo "Used default values."
-	line=1
-else
-	line=$1
-fi
-
-echo "Line: "$line
+IP=10.34.58.70
+USER="ubuntu"
+KEY="$HOME/.ssh/DemoMAAS"
 
 #http://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR
 
-#https://stackoverflow.com/questions/15632691/fastest-way-to-print-a-single-line-in-a-file
-node="$( head -n $line sensorSimulatorNode.txt | tail -1)"
-
-echo "=== Stop all Sensor Simulators via ssh on $node ==="
-ssh -i ~/.ssh/lukasPMAAS ubuntu@$node ./streamteam-sensor-simulator/kill.sh
+echo "=== Stop all Sensor Simulators via ssh on $IP ==="
+ssh -i $KEY $USER@$IP ./streamteam-sensor-simulator/kill.sh

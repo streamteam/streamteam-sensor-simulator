@@ -24,7 +24,7 @@
 
     <groupId>ch.unibas.dmi.dbis</groupId>
     <artifactId>streamteam-sensor-simulator</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <name>StreamTeam - Sensor Simulator</name>
     <url>https://dbis.dmi.unibas.ch/research/projects/streamTeam/</url>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>ch.unibas.dmi.dbis</groupId>
             <artifactId>streamteam-data-model</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
         </dependency>
     </dependencies>
 
@@ -72,7 +72,6 @@
         <kafka.version>2.0.1</kafka.version>
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.13.3</log4j.version>
-        <junit.version>4.12</junit.version>
         <protobuf.version>3.13.0</protobuf.version>
     </properties>
 

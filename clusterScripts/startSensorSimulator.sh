@@ -22,21 +22,19 @@ die() {
 	echo >&2 "$@"
 	exit 1
 }
-[ "$#" -ge 2 ] || die "requires at least two arguments (line, match), $# provided"
+[ "$#" -ge 1 ] || die "requires at least one argument (match), $# provided"
 
-line=$1
-match=$2
-
-echo "Line: "$line
+match=$1
 echo "Match: "$match
+
+IP=10.34.58.70
+USER="ubuntu"
+KEY="$HOME/.ssh/DemoMAAS"
 
 #http://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR
 
-#https://stackoverflow.com/questions/15632691/fastest-way-to-print-a-single-line-in-a-file
-node="$( head -n $line sensorSimulatorNode.txt | tail -1)"
-
-echo "=== Start Sensor Simulator via ssh on $node ==="
-ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "cd streamteam-sensor-simulator; ./launchSimulationEnvironmentOnASingleMachine.py "$match
+echo "=== Start Sensor Simulator via ssh on $IP ==="
+ssh -i $KEY $USER@$IP "cd streamteam-sensor-simulator; ./launchSimulationEnvironmentOnASingleMachine.py "$match

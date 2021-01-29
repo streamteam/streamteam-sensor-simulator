@@ -18,7 +18,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-node=`cat sensorSimulatorNode.txt`
+IP=10.34.58.70
+USER="ubuntu"
+KEY="$HOME/.ssh/DemoMAAS"
 
 #http://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -34,12 +36,8 @@ cd ..
 rm streamteam-sensor-simulator.tar.gz
 tar -czf streamteam-sensor-simulator.tar.gz streamteam-sensor-simulator/
 
-for node in `cat $DIR/sensorSimulatorNode.txt`; do
-	echo "=== Deploy on $node ==="
-	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "rm -Rf streamteam-sensor-simulator"
-	scp -i ~/.ssh/lukasPMAAS ./streamteam-sensor-simulator.tar.gz ubuntu@$node:streamteam-sensor-simulator.tar.gz
-	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "tar -xzf streamteam-sensor-simulator.tar.gz"
-	ssh -i ~/.ssh/lukasPMAAS ubuntu@$node "rm streamteam-sensor-simulator.tar.gz"
-done
-
+ssh -i $KEY $USER@$IP "rm -Rf streamteam-sensor-simulator"
+scp -i $KEY ./streamteam-sensor-simulator.tar.gz $USER@$IP:streamteam-sensor-simulator.tar.gz
+ssh -i $KEY $USER@$IP "tar -xzf streamteam-sensor-simulator.tar.gz"
+ssh -i $KEY $USER@$IP "rm streamteam-sensor-simulator.tar.gz"
 rm streamteam-sensor-simulator.tar.gz

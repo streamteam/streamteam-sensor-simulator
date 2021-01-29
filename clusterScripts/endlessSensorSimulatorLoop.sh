@@ -22,12 +22,9 @@ die() {
 	echo >&2 "$@"
 	exit 1
 }
-[ "$#" -ge 2 ] || die "requires at least two arguments (line, match), $# provided"
+[ "$#" -ge 1 ] || die "requires at least one argument (match), $# provided"
 
-line=$1
-match=$2
-
-echo "Line: "$line
+match=$1
 echo "Match: "$match
 
 #http://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
@@ -38,10 +35,10 @@ cd $DIR
 #https://www.cyberciti.biz/faq/bash-for-loop/
 for (( ; ; ))
 do
-	./startSensorSimulator.sh $line $match &
+	./startSensorSimulator.sh $match &
 	sleep 46m
 	echo "Slept for 46 minutes"
-	./stopSensorSimulatorsOnNode.sh $line
+	./stopAllSensorSimulators.sh
 	echo "Stopped SensorSimulator."
 	sleep 10s
 done

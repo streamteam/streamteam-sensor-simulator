@@ -63,7 +63,7 @@ for curSid in sids:
     print "Start Sensor Simulator for sensor " + curSid
 
     logFileNameCommandPart = "-DlogFileName=SensorSimulator_" + str(matchId) + "_" + curSid.replace("/", "_") + "_local"
-    jarCommandPart = "-jar ./target/streamteam-sensor-simulator-1.1.0-jar-with-dependencies.jar"
+    jarCommandPart = "-jar ./target/streamteam-sensor-simulator-1.2.0-jar-with-dependencies.jar"
     curPathToSensorDataFile = pathToSensorDataFiles + curSid + ".csv"
     argsCommandPart = logFileNameCommandPart + " " + jarCommandPart + " " + matchConfigFile + " " + str(matchId) + " " + curPathToSensorDataFile + " " + simulationStartTimeInMsString + " " + isMatchAnnouncer
 
